@@ -1,21 +1,17 @@
 /*
-	LEDEffect.cpp - Library for LED Effecs.
-	Created by Harrison H. Jones, October 3, 2014.
+	RGBEffect.cpp - Effect Library for the Spark Core's RGB LED.
+	Created by Harrison H. Jones, Jan 25, 2015.
 */
 
 #if defined (SPARK)
 #include "application.h"
 #else
-#if defined(ARDUINO) && ARDUINO >= 100
-#include "Arduino.h"
-#else
-#include "WProgram.h"
-#endif
+#error "Only SparkCore RGB LED Supported."
 #endif
 
-#include "LEDEffect.h"
+#include "RGBEffect.h"
 
-LEDEffect::LEDEffect(int pin)
+RGBEffect::RGBEffect(int pin)
 {
 	pinMode(pin, OUTPUT);
 	_pin = pin;
@@ -27,7 +23,7 @@ LEDEffect::LEDEffect(int pin)
 	_ledDelay = 30; // in ms
 }
 
-void LEDEffect::update()
+void RGBEffect::update()
 {
 	if((millis() - _time) > _ledDelay)
 	{
@@ -75,19 +71,19 @@ void LEDEffect::update()
 	}
     analogWrite(_pin, _brightness);  
 }
-void LEDEffect::off()
+void RGBEffect::off()
 {
 	_ledState = 0;
 	_ledDelay = 10;
 }
 
-void LEDEffect::on()
+void RGBEffect::on()
 {
 	_ledState = 1;
 	_ledDelay = 10;
 }
 
-void LEDEffect::breath(int ledDelay)
+void RGBEffect::breath(int ledDelay)
 {
     if(_brightness == 0)
         _fadeDirection = _fadeAmount;
@@ -97,7 +93,7 @@ void LEDEffect::breath(int ledDelay)
 	_ledDelay = ledDelay;
 }
 
-void LEDEffect::fadeDown(int ledDelay)
+void RGBEffect::fadeDown(int ledDelay)
 {
     if(_brightness == 0)
         _brightness = 255;
@@ -106,7 +102,7 @@ void LEDEffect::fadeDown(int ledDelay)
 	_ledDelay = ledDelay;
 }
 
-void LEDEffect::fadeUp(int ledDelay)
+void RGBEffect::fadeUp(int ledDelay)
 {
     if(_brightness == 255)
         _brightness = 0;
@@ -115,13 +111,13 @@ void LEDEffect::fadeUp(int ledDelay)
 	_ledDelay = ledDelay;
 }
 
-void LEDEffect::blink(int ledDelay)
+void RGBEffect::blink(int ledDelay)
 {
 	_ledState = 5;
 	_ledDelay = ledDelay;
 }
 
-void LEDEffect::dim(unsigned char brightness)
+void RGBEffect::dim(unsigned char brightness)
 {
     _ledState = 6;
     _brightness = brightness;

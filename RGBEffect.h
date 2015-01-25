@@ -1,25 +1,21 @@
 /*
-	LEDEffect.h - Library for LED Effecs.
-	Created by Harrison H. Jones, October 3, 2014.
+	RGBEffect.cpp - Effect Library for the Spark Core's RGB LED.
+	Created by Harrison H. Jones, Jan 25, 2015.
 */
 
-#ifndef LEDEffect_h
-#define LEDEffect_h
+#ifndef RGBEffect_h
+#define RGBEffect_h
 
 #if defined (SPARK)
 #include "application.h"
 #else
-#if defined(ARDUINO) && ARDUINO >= 100
-#include "Arduino.h"
-#else
-#include "WProgram.h"
-#endif
+#error "Only SparkCore RGB LED Supported."
 #endif
 
-class LEDEffect
+class RGBEffect
 {
   public:
-	LEDEffect(int pin);
+	RGBEffect(int pin);
 	void update();
 	void off();
 	void on();
