@@ -11,16 +11,17 @@
 
 #include "RGBEffect.h"
 
-RGBEffect::RGBEffect(int pin)
+RGBEffect::RGBEffect()
 {
-	pinMode(pin, OUTPUT);
-	_pin = pin;
 	_time = millis();
-	_brightness = 125;
 	_fadeAmount = 5;    // how many points to fade the LED by
 	_fadeDirection = _fadeAmount; 
 	_ledState = 0;     // 0 = off, 1 = on, 2 = breath, 3 = fade down, 4 = fade up, 5 = blink
 	_ledDelay = 30; // in ms
+        // Color 1 = White
+        _red[0] = 255;
+        _green[0] = 255;
+        _blue[0] = 255;
 }
 
 void RGBEffect::update()
@@ -77,10 +78,12 @@ void RGBEffect::off()
 	_ledDelay = 10;
 }
 
-void RGBEffect::on()
+void RGBEffect::on(unsigned char colorNum)
 {
-	_ledState = 1;
-	_ledDelay = 10;
+    RGB.control(true);
+    RGB.color(_red[colorNum],_green[colorNum],_blue[colorNum]);
+    _ledState = 1;
+    _ledDelay = 10;
 }
 
 void RGBEffect::breath(int ledDelay)
