@@ -13,6 +13,8 @@
 #endif
 
 #define NUM_COLORS 255
+#define MAX_SEQUENCE_LENGTH 10
+
 #define STATE_OFF 0
 #define STATE_ON 1
 #define STATE_BREATH 2
@@ -26,9 +28,9 @@ class RGBEffect
         void update();                  // Updates the LED's color/brightness
         void off();                     // Turns OFF the LED (dark)
         void on(unsigned char colorNum);// Turns ON the LED
-        void breath(unsigned char colorNum1, unsigned char colorNum2);                  // Breaths between two colors
-        void fade(unsigned char colorNum1, unsigned char colorNum2);                    // Fades from color 1 to 2
-        void blink(unsigned char colorNum1, unsigned char colorNum2);                   // Blinks between two colors
+        void breath(unsigned int colorNumSeq[], unsigned int numInSeq);                  // Breaths between two colors
+        void fade(unsigned int colorNumSeq[], unsigned int numInSeq);                    // Fades from color 1 to 2
+        void blink(unsigned int colorNumSeq[], unsigned int numInSeq);                   // Blinks between colors
         void release();                 // Releases control of the RGB object
         void setColor(unsigned char colorNum, unsigned int red, unsigned int green, unsigned int blue);
         void setDelay(unsigned int ledDelay);
@@ -42,8 +44,10 @@ class RGBEffect
         unsigned char _ledState;     
         unsigned int _ledDelay; // in ms
         unsigned long _time;
-        unsigned char _destinationColor;
-        unsigned char _sourceColor;
+        unsigned int _colorSequence[MAX_SEQUENCE_LENGTH];
+        unsigned int _colorSequenceNum;
+        unsigned int _colorSequenceIndex;
+        void _copySequence(unsigned int colorNumSeq[], unsigned int numInSeq);
 };
 
 #endif

@@ -22,6 +22,9 @@ RGBEffect::RGBEffect()
         _red[0] = 255;
         _green[0] = 255;
         _blue[0] = 255;
+        _colorSequence[0] = 0;
+        _colorSequenceNum = 1;
+        _colorSequenceIndex = 0;    // Point to the first entry in _colorSequence
 }
 
 void RGBEffect::update()
@@ -33,7 +36,7 @@ void RGBEffect::update()
 		if(_ledState == STATE_OFF)
                     RGB.color(0,0,0);
 		else if(_ledState == STATE_ON)
-                    RGB.color(_red[_destinationColor],_green[_destinationColor],_blue[_destinationColor]);
+                    RGB.color(_red[_colorSequence[0]],_green[_colorSequence[0]],_blue[_colorSequence[0]]);
 		else if (_ledState == STATE_BREATH)
 		{
                     /*
@@ -55,10 +58,10 @@ void RGBEffect::update()
 		}
 		else if (_ledState == STATE_BLINK)	// Fade up
 		{
-                    unsigned char temp = _destinationColor;
-                    _destinationColor = _sourceColor;
-                    _sourceColor = temp;
-                    RGB.color(_red[_destinationColor],_green[_destinationColor],_blue[_destinationColor]);
+                    RGB.color(_red[_colorSequence[_colorSequenceIndex]],_green[_colorSequence[_colorSequenceIndex]],_blue[_colorSequence[_colorSequenceIndex]]);
+                    _colorSequenceIndex++;
+                    if(_colorSequenceIndex >= _colorSequenceNum)
+                        _colorSequenceIndex = 0;
 		}
 	} 
 }
@@ -70,28 +73,26 @@ void RGBEffect::off()
 void RGBEffect::on(unsigned char colorNum)
 {
     _ledState = STATE_ON;
-    _destinationColor = colorNum;
+    _colorSequence[0] = colorNum;
+    _colorSequenceNum = 1;
 }
 
-void RGBEffect::breath(unsigned char colorNum1, unsigned char colorNum2)
+void RGBEffect::breath(unsigned int colorNumSeq[], unsigned int numInSeq)
 {
     _ledState = STATE_BREATH;
-    _sourceColor = colorNum1;
-    _destinationColor = colorNum2;
+    _copySequence(colorNumSeq, numInSeq);
 }
 
-void RGBEffect::fade(unsigned char colorNum1, unsigned char colorNum2)
+void RGBEffect::fade(unsigned int colorNumSeq[], unsigned int numInSeq)
 {
-    _sourceColor = colorNum1;
-    _destinationColor = colorNum2;
     _ledState = STATE_FADE;
+    _copySequence(colorNumSeq, numInSeq);
 }
 
-void RGBEffect::blink(unsigned char colorNum1, unsigned char colorNum2)
+void RGBEffect::blink(unsigned int colorNumSeq[], unsigned int numInSeq)
 {
     _ledState = STATE_BLINK;
-    _sourceColor = colorNum1;
-    _destinationColor = colorNum2;
+    _copySequence(colorNumSeq, numInSeq);
 }
 
 void RGBEffect::release()
@@ -103,7 +104,6 @@ void RGBEffect::setColor(unsigned char colorNum, unsigned int red, unsigned int 
     _red[colorNum] = red;
     _green[colorNum] = green;
     _blue[colorNum] = blue;
-    
 }
 
 void RGBEffect::setDelay(unsigned int ledDelay)
@@ -124,4 +124,13 @@ void RGBEffect::swapColors(unsigned char colorNum1, unsigned char colorNum2)
     _red[colorNum2] = red;
     _green[colorNum2] = green;
     _blue[colorNum2] = blue;
+}
+
+void RGBEffect::_copySequence(unsigned int colorNumSeq[], unsigned int numInSeq)
+{
+    if(numInSeq > MAX_SEQUENCE_LENGTH)  // Truncate if too many in sequence
+        numInSeq = MAX_SEQUENCE_LENGTH;
+    for(unsigned int i=0;i<numInSeq;i++)
+        _colorSequence[i] = colorNumSeq[i];
+    _colorSequenceNum = numInSeq;
 }
