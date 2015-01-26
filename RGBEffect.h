@@ -15,18 +15,17 @@
 class RGBEffect
 {
   public:
-	RGBEffect(int pin);
-	void update();
-	void off();
+	RGBEffect();                    // Constructor
+	void update();                  // Updates the LED's color/brightness
+	void off();                     // Turns OFF the LED (dark))
 	void on();
 	void breath(int ledDelay);
 	void fadeDown(int ledDelay);
 	void fadeUp(int ledDelay);
 	void blink(int ledDelay);
 	void dim(unsigned char brightness);
+        void release();
   private:
-	int _pin;
-	unsigned char _brightness;
 	unsigned char _fadeAmount;    // how many points to fade the LED by
 	unsigned char _fadeDirection; 
 	unsigned char _ledState;     // 0 = off, 1 = on, 2 = breath, 3 = fade down, 4 = fade up, 5 = blink
