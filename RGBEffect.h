@@ -12,7 +12,12 @@
 #error "Only SparkCore RGB LED Supported."
 #endif
 
-#define NUM_COLORS 255;
+#define NUM_COLORS 255
+#define STATE_OFF 0
+#define STATE_ON 1
+#define STATE_BREATH 2
+#define STATE_FADE 3
+#define STATE_BLINK 4
 
 class RGBEffect
 {
@@ -29,10 +34,12 @@ class RGBEffect
         void setDelay(unsigned int ledDelay);
         void swapColors();              // Swaps color 1 and color 2
     private:
-        unsigned int _red[NUM_COLORS], _green[NUM_COLORS], _blue[NUM_COLORS];    // Different colors
+        unsigned int _red[NUM_COLORS];
+        unsigned int _green[NUM_COLORS];
+        unsigned int _blue[NUM_COLORS];    // Different colors
         unsigned char _fadeAmount;    // how many points to fade the LED by
         unsigned char _fadeDirection; 
-        unsigned char _ledState;     // 0 = off, 1 = on, 2 = breath, 3 = fade down, 4 = fade up, 5 = blink
+        unsigned char _ledState;     
         unsigned int _ledDelay; // in ms
         unsigned long _time;
 };

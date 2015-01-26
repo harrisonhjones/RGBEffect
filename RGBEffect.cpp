@@ -88,7 +88,7 @@ void RGBEffect::on(unsigned char colorNum)
     _ledDelay = 10;
 }
 
-void RGBEffect::breath(int ledDelay)
+void RGBEffect::breath()
 {
     if(_brightness == 0)
         _fadeDirection = _fadeAmount;
@@ -98,16 +98,7 @@ void RGBEffect::breath(int ledDelay)
 	_ledDelay = ledDelay;
 }
 
-void RGBEffect::fadeDown(int ledDelay)
-{
-    if(_brightness == 0)
-        _brightness = 255;
-    _fadeDirection = -_fadeAmount;
-	_ledState = 3;
-	_ledDelay = ledDelay;
-}
-
-void RGBEffect::fadeUp(int ledDelay)
+void RGBEffect::fade()
 {
     if(_brightness == 255)
         _brightness = 0;
@@ -116,15 +107,13 @@ void RGBEffect::fadeUp(int ledDelay)
 	_ledDelay = ledDelay;
 }
 
-void RGBEffect::blink(int ledDelay)
+void RGBEffect::blink()
 {
 	_ledState = 5;
 	_ledDelay = ledDelay;
 }
 
-void RGBEffect::dim(unsigned char brightness)
-{
-    _ledState = 6;
-    _brightness = brightness;
-    _ledDelay = 1000;   // Not really required. 
-}
+void RGBEffect::release();                 // Releases control of the RGB object
+void RGBEffect::setColor(unsigned char colorNum, unsigned int red, unsigned int green, unsigned int blue);
+void RGBEffect::setDelay(unsigned int ledDelay);
+void RGBEffect::swapColors(); 
