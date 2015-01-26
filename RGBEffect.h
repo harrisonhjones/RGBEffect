@@ -26,13 +26,13 @@ class RGBEffect
         void update();                  // Updates the LED's color/brightness
         void off();                     // Turns OFF the LED (dark)
         void on(unsigned char colorNum);// Turns ON the LED
-        void breath();                  // Breaths between two colors
-        void fade();                    // Fades from color 1 to 2
-        void blink();                   // Blinks between two colors
+        void breath(unsigned char colorNum1, unsigned char colorNum2);                  // Breaths between two colors
+        void fade(unsigned char colorNum1, unsigned char colorNum2);                    // Fades from color 1 to 2
+        void blink(unsigned char colorNum1, unsigned char colorNum2);                   // Blinks between two colors
         void release();                 // Releases control of the RGB object
         void setColor(unsigned char colorNum, unsigned int red, unsigned int green, unsigned int blue);
         void setDelay(unsigned int ledDelay);
-        void swapColors();              // Swaps color 1 and color 2
+        void swapColors(unsigned char colorNum1, unsigned char colorNum2);
     private:
         unsigned int _red[NUM_COLORS];
         unsigned int _green[NUM_COLORS];
@@ -42,6 +42,8 @@ class RGBEffect
         unsigned char _ledState;     
         unsigned int _ledDelay; // in ms
         unsigned long _time;
+        unsigned char _destinationColor;
+        unsigned char _sourceColor;
 };
 
 #endif

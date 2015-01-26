@@ -29,91 +29,99 @@ void RGBEffect::update()
 	if((millis() - _time) > _ledDelay)
 	{
 		_time = millis();
-		if(_ledState == 0)
-			_brightness = 0;
-		else if(_ledState == 1)
-			_brightness = 255;
-		else if (_ledState == 2)
+                RGB.control(true);
+		if(_ledState == STATE_OFF)
+                    RGB.color(0,0,0);
+		else if(_ledState == STATE_ON)
+                    RGB.color(_red[_destinationColor],_green[_destinationColor],_blue[_destinationColor]);
+		else if (_ledState == STATE_BREATH)
 		{
+                    /*
 			// change the _brightness for next time through the loop:
 			_brightness = _brightness + _fadeDirection;
 			// reverse the direction of the fading at the ends of the fade:
 			if (_brightness == 0)
 				_fadeDirection = _fadeAmount;
 			else if (_brightness == 255)
-				_fadeDirection = -_fadeAmount;
+				_fadeDirection = -_fadeAmount;*/
 		}
-		else if (_ledState == 3)	// Fade down
+		else if (_ledState == STATE_FADE)	// Fade down
 		{
-			// change the _brightness for next time through the loop:
+			/*// change the _brightness for next time through the loop:
 			_brightness = _brightness - _fadeAmount;
 			// reverse the direction of the fading at the ends of the fade:
 			if (_brightness == 0)
-				_brightness = 255;
+				_brightness = 255;*/
 		}
-		else if (_ledState == 4)	// Fade up
+		else if (_ledState == STATE_BLINK)	// Fade up
 		{
-			// change the _brightness for next time through the loop:
-			_brightness = _brightness + _fadeAmount;
-			// reverse the direction of the fading at the ends of the fade:
-			if (_brightness == 255)
-				_brightness = 0;
+                    unsigned char temp = _destinationColor;
+                    _destinationColor = _sourceColor;
+                    _sourceColor = temp;
+                    RGB.color(_red[_destinationColor],_green[_destinationColor],_blue[_destinationColor]);
 		}
-		else if(_ledState == 5)
-		{
-			if(_brightness == 255)
-				_brightness = 0;
-			else
-				_brightness = 255;
-		}
-		else if(_ledState == 6) // Dim
-		{
-		}
-	}
-    analogWrite(_pin, _brightness);  
+	} 
 }
 void RGBEffect::off()
 {
-    RGB.control(true);
-    RGB.color(0,0,0);
-    _ledState = 0;
-    _ledDelay = 10;
+    _ledState = STATE_OFF;
 }
 
 void RGBEffect::on(unsigned char colorNum)
 {
-    RGB.control(true);
-    RGB.color(_red[colorNum],_green[colorNum],_blue[colorNum]);
-    _ledState = 1;
-    _ledDelay = 10;
+    _ledState = STATE_ON;
+    _destinationColor = colorNum;
 }
 
-void RGBEffect::breath()
+void RGBEffect::breath(unsigned char colorNum1, unsigned char colorNum2)
 {
-    if(_brightness == 0)
-        _fadeDirection = _fadeAmount;
-    else if(_brightness == 255)
-        _fadeDirection = -_fadeAmount;
-	_ledState = 2;
-	_ledDelay = ledDelay;
+    _ledState = STATE_BREATH;
+    _sourceColor = colorNum1;
+    _destinationColor = colorNum2;
 }
 
-void RGBEffect::fade()
+void RGBEffect::fade(unsigned char colorNum1, unsigned char colorNum2)
 {
-    if(_brightness == 255)
-        _brightness = 0;
-    _fadeDirection = _fadeAmount;
-	_ledState = 4;
-	_ledDelay = ledDelay;
+    _sourceColor = colorNum1;
+    _destinationColor = colorNum2;
+    _ledState = STATE_FADE;
 }
 
-void RGBEffect::blink()
+void RGBEffect::blink(unsigned char colorNum1, unsigned char colorNum2)
 {
-	_ledState = 5;
-	_ledDelay = ledDelay;
+    _ledState = STATE_BLINK;
+    _sourceColor = colorNum1;
+    _destinationColor = colorNum2;
 }
 
-void RGBEffect::release();                 // Releases control of the RGB object
-void RGBEffect::setColor(unsigned char colorNum, unsigned int red, unsigned int green, unsigned int blue);
-void RGBEffect::setDelay(unsigned int ledDelay);
-void RGBEffect::swapColors(); 
+void RGBEffect::release()
+{
+    RGB.control(false);
+}
+void RGBEffect::setColor(unsigned char colorNum, unsigned int red, unsigned int green, unsigned int blue)
+{
+    _red[colorNum] = red;
+    _green[colorNum] = green;
+    _blue[colorNum] = blue;
+    
+}
+
+void RGBEffect::setDelay(unsigned int ledDelay)
+{
+    _ledDelay = ledDelay;
+}
+
+void RGBEffect::swapColors(unsigned char colorNum1, unsigned char colorNum2)
+{
+    unsigned int red = _red[colorNum1];
+    unsigned int green = _green[colorNum1];
+    unsigned int blue = _blue[colorNum1];
+    
+    _red[colorNum1] = _red[colorNum2];
+    _green[colorNum1] = _green[colorNum2];
+    _blue[colorNum1] = _blue[colorNum2];
+    
+    _red[colorNum2] = red;
+    _green[colorNum2] = green;
+    _blue[colorNum2] = blue;
+}
