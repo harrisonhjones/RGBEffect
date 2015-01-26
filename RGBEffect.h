@@ -14,6 +14,7 @@
 
 #define NUM_COLORS 255
 #define MAX_SEQUENCE_LENGTH 10
+#define FADE_AMOUNT 5
 
 #define STATE_OFF 0
 #define STATE_ON 1
@@ -36,6 +37,9 @@ class RGBEffect
         void setDelay(unsigned int ledDelay);
         void swapColors(unsigned char colorNum1, unsigned char colorNum2);
     private:
+        unsigned int _currRed;
+        unsigned int _currGreen;
+        unsigned int _currBlue;
         unsigned int _red[NUM_COLORS];
         unsigned int _green[NUM_COLORS];
         unsigned int _blue[NUM_COLORS];    // Different colors
@@ -48,6 +52,11 @@ class RGBEffect
         unsigned int _colorSequenceNum;
         unsigned int _colorSequenceIndex;
         void _copySequence(unsigned int colorNumSeq[], unsigned int numInSeq);
+        unsigned int _colorDiff(unsigned int colorNum);
+        void _moveTowardsColor(unsigned int colorNum);
+        void _setColor(unsigned int red, unsigned int green, unsigned int blue);
+        void _setColor(unsigned char colorNum);
+        void _setColorS(unsigned char sequenceIndex);
 };
 
 #endif

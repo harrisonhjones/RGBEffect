@@ -32,11 +32,11 @@ void RGBEffect::update()
 	if((millis() - _time) > _ledDelay)
 	{
 		_time = millis();
-                RGB.control(true);
+                
 		if(_ledState == STATE_OFF)
-                    RGB.color(0,0,0);
+                    _setColor(0,0,0);
 		else if(_ledState == STATE_ON)
-                    RGB.color(_red[_colorSequence[0]],_green[_colorSequence[0]],_blue[_colorSequence[0]]);
+                    _setColor(0);
 		else if (_ledState == STATE_BREATH)
 		{
                     /*
@@ -48,17 +48,24 @@ void RGBEffect::update()
 			else if (_brightness == 255)
 				_fadeDirection = -_fadeAmount;*/
 		}
-		else if (_ledState == STATE_FADE)	// Fade down
+		else if (_ledState == STATE_FADE)
 		{
-			/*// change the _brightness for next time through the loop:
-			_brightness = _brightness - _fadeAmount;
-			// reverse the direction of the fading at the ends of the fade:
-			if (_brightness == 0)
-				_brightness = 255;*/
+                    // Fading starts at the current color in the sequence and then gradually moves toward the next one. 
+                    // Once it reaches the end of the sequence it abruptely transitions t the first color in the sequence
+                    /*if(_colorDiff(_colorSequence[_colorSequenceIndex + 1]) == 0)    // We are at the next color
+                    {
+                        if((_colorSequenceIndex + 1) >= _colorSequenceNum)    // We are at the end of the sequence
+                        {
+                            _colorSequenceIndex = 0;
+                            _se
+                        }
+                        _colorSequenceIndex = 0;
+                    }
+                    _moveTowardsColor(unsigned int colorNum)*/
 		}
-		else if (_ledState == STATE_BLINK)	// Fade up
+		else if (_ledState == STATE_BLINK)
 		{
-                    RGB.color(_red[_colorSequence[_colorSequenceIndex]],_green[_colorSequence[_colorSequenceIndex]],_blue[_colorSequence[_colorSequenceIndex]]);
+                    _setColorS(_colorSequenceIndex);
                     _colorSequenceIndex++;
                     if(_colorSequenceIndex >= _colorSequenceNum)
                         _colorSequenceIndex = 0;
@@ -133,4 +140,66 @@ void RGBEffect::_copySequence(unsigned int colorNumSeq[], unsigned int numInSeq)
     for(unsigned int i=0;i<numInSeq;i++)
         _colorSequence[i] = colorNumSeq[i];
     _colorSequenceNum = numInSeq;
+}
+
+/**
+ _colorDiff
+ 
+ Returns the absolute difference between two colors: the active color and the 
+ color designated by colorNum
+ */
+unsigned int RGBEffect::_colorDiff(unsigned int colorNum)
+{
+    unsigned int redDiff = abs(_currRed - _red[colorNum]);
+    unsigned int greenDiff = abs(_currGreen - _green[colorNum]);
+    unsigned int blueDiff = abs(_currBlue - _blue[colorNum]);
+    return redDiff + greenDiff + blueDiff;
+}
+
+void RGBEffect::_moveTowardsColor(unsigned int colorNum)
+{
+    if(_colorDiff(colorNum) == 0)
+        return;
+    
+    if (_currRed > (_red[colorNum] + FADE_AMOUNT))
+        _currRed -= FADE_AMOUNT;
+    else if(_currRed < (_red[colorNum] - FADE_AMOUNT))
+        _currRed += FADE_AMOUNT;
+    else
+        _currRed = _red[colorNum];
+    
+    if (_currGreen > (_green[colorNum] + FADE_AMOUNT))
+        _currGreen -= FADE_AMOUNT;
+    else if(_currRed < (_green[colorNum] - FADE_AMOUNT))
+        _currGreen += FADE_AMOUNT;
+    else
+        _currGreen = _green[colorNum]; 
+    
+    if (_currBlue > (_blue[colorNum] + FADE_AMOUNT))
+        _currBlue -= FADE_AMOUNT;
+    else if(_currBlue < (_blue[colorNum] - FADE_AMOUNT))
+        _currBlue += FADE_AMOUNT;
+    else
+        _currBlue = _blue[colorNum]; 
+    
+    _setColor(_currRed,_currGreen,_currBlue);
+}
+
+void RGBEffect::_setColor(unsigned int red, unsigned int green, unsigned int blue)
+{
+    RGB.control(true);
+    RGB.color(red,green,blue);
+    _currRed = red;
+    _currGreen = green;
+    _currBlue = blue;
+}
+
+void RGBEffect::_setColor(unsigned char colorNum)
+{
+    _setColor(_red[colorNum],_green[colorNum],_blue[colorNum]);
+}
+
+void RGBEffect::_setColorS(unsigned char sequenceIndex)
+{
+    _setColor(_colorSequence[sequenceIndex]);
 }
