@@ -74,8 +74,10 @@ void RGBEffect::update()
 }
 void RGBEffect::off()
 {
-	_ledState = 0;
-	_ledDelay = 10;
+    RGB.control(true);
+    RGB.color(0,0,0);
+    _ledState = 0;
+    _ledDelay = 10;
 }
 
 void RGBEffect::on(unsigned char colorNum)
