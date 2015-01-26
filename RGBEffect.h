@@ -13,6 +13,7 @@
 #endif
 
 #define NUM_COLORS 255
+#define MAX_RGB_VALUE 255
 #define MAX_SEQUENCE_LENGTH 10
 #define FADE_AMOUNT 5
 
@@ -54,9 +55,10 @@ class RGBEffect
         void _copySequence(unsigned int colorNumSeq[], unsigned int numInSeq);
         unsigned int _colorDiff(unsigned int colorNum);
         void _moveTowardsColor(unsigned int colorNum);
+        void _moveTowardsColorS(unsigned int sequenceIndex);
         void _setColor(unsigned int red, unsigned int green, unsigned int blue);
         void _setColor(unsigned char colorNum);
-        void _setColorS(unsigned char sequenceIndex);
+        void _setColorS(unsigned int sequenceIndex);
 };
 
 #endif

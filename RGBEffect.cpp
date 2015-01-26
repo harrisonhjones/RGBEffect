@@ -39,29 +39,29 @@ void RGBEffect::update()
                     _setColor(0);
 		else if (_ledState == STATE_BREATH)
 		{
-                    /*
-			// change the _brightness for next time through the loop:
-			_brightness = _brightness + _fadeDirection;
-			// reverse the direction of the fading at the ends of the fade:
-			if (_brightness == 0)
-				_fadeDirection = _fadeAmount;
-			else if (_brightness == 255)
-				_fadeDirection = -_fadeAmount;*/
+                    if(_colorDiff(_colorSequence[_colorSequenceIndex]) == 0)    // We have reached the current color
+                    {
+                        _colorSequenceIndex++;
+                        if(_colorSequenceIndex >= _colorSequenceNum)
+                            _colorSequenceIndex = 0;
+                    }
+                    _moveTowardsColorS(_colorSequenceIndex);
 		}
 		else if (_ledState == STATE_FADE)
 		{
                     // Fading starts at the current color in the sequence and then gradually moves toward the next one. 
                     // Once it reaches the end of the sequence it abruptely transitions t the first color in the sequence
-                    /*if(_colorDiff(_colorSequence[_colorSequenceIndex + 1]) == 0)    // We are at the next color
+                    if(_colorDiff(_colorSequence[_colorSequenceIndex]) == 0)    // We have reached the current color
                     {
-                        if((_colorSequenceIndex + 1) >= _colorSequenceNum)    // We are at the end of the sequence
+                        _colorSequenceIndex++;
+                        if(_colorSequenceIndex >= _colorSequenceNum)
                         {
                             _colorSequenceIndex = 0;
-                            _se
+                            _setColorS(_colorSequenceIndex);
                         }
-                        _colorSequenceIndex = 0;
                     }
-                    _moveTowardsColor(unsigned int colorNum)*/
+                    _moveTowardsColorS(_colorSequenceIndex);
+                    
 		}
 		else if (_ledState == STATE_BLINK)
 		{
@@ -88,12 +88,15 @@ void RGBEffect::breath(unsigned int colorNumSeq[], unsigned int numInSeq)
 {
     _ledState = STATE_BREATH;
     _copySequence(colorNumSeq, numInSeq);
+    _colorSequenceIndex = 0;
 }
 
 void RGBEffect::fade(unsigned int colorNumSeq[], unsigned int numInSeq)
 {
     _ledState = STATE_FADE;
     _copySequence(colorNumSeq, numInSeq);
+    _colorSequenceIndex = 0;
+    _setColorS(_colorSequenceIndex); // Instantly transition to the first color
 }
 
 void RGBEffect::blink(unsigned int colorNumSeq[], unsigned int numInSeq)
@@ -161,37 +164,90 @@ void RGBEffect::_moveTowardsColor(unsigned int colorNum)
     if(_colorDiff(colorNum) == 0)
         return;
     
-    if (_currRed > (_red[colorNum] + FADE_AMOUNT))
-        _currRed -= FADE_AMOUNT;
-    else if(_currRed < (_red[colorNum] - FADE_AMOUNT))
-        _currRed += FADE_AMOUNT;
-    else
+    int redDiff = _currRed - _red[colorNum];
+    int greenDiff = _currGreen - _green[colorNum];
+    int blueDiff = _currBlue - _blue[colorNum];
+    
+    if (abs(redDiff) <= FADE_AMOUNT)
+    {
+        Serial.println("redDiff ~= FADE_AMOUNT");
         _currRed = _red[colorNum];
-    
-    if (_currGreen > (_green[colorNum] + FADE_AMOUNT))
-        _currGreen -= FADE_AMOUNT;
-    else if(_currRed < (_green[colorNum] - FADE_AMOUNT))
-        _currGreen += FADE_AMOUNT;
+    }
     else
-        _currGreen = _green[colorNum]; 
+    {
+        if (redDiff > FADE_AMOUNT)
+        {
+            _currRed -= FADE_AMOUNT;
+            Serial.println("redDiff > FADE_AMOUNT");
+        }
+        else
+        {
+            Serial.println("redDiff < FADE_AMOUNT");
+            _currRed += FADE_AMOUNT;
+        }
+    }
     
-    if (_currBlue > (_blue[colorNum] + FADE_AMOUNT))
-        _currBlue -= FADE_AMOUNT;
-    else if(_currBlue < (_blue[colorNum] - FADE_AMOUNT))
-        _currBlue += FADE_AMOUNT;
+    if (abs(greenDiff) <= FADE_AMOUNT)
+    {
+        _currGreen = _green[colorNum];
+    }
     else
-        _currBlue = _blue[colorNum]; 
+    {
+        if (greenDiff > FADE_AMOUNT)
+        {
+            _currGreen -= FADE_AMOUNT;
+        }
+        else
+        {
+            _currGreen += FADE_AMOUNT;
+        }
+    }
+    
+    if (abs(blueDiff) <= FADE_AMOUNT)
+    {
+        _currBlue = _blue[colorNum];
+    }
+    else
+    {
+        if (blueDiff > FADE_AMOUNT)
+        {
+            _currBlue -= FADE_AMOUNT;
+        }
+        else
+        {
+            _currBlue += FADE_AMOUNT;
+        }
+    }
     
     _setColor(_currRed,_currGreen,_currBlue);
 }
 
+void RGBEffect::_moveTowardsColorS(unsigned int sequenceIndex)
+{
+    _moveTowardsColor(_colorSequence[sequenceIndex]);
+}
+
 void RGBEffect::_setColor(unsigned int red, unsigned int green, unsigned int blue)
 {
+    if(red > MAX_RGB_VALUE)
+        red = MAX_RGB_VALUE;
+    if(green > MAX_RGB_VALUE)
+        green = MAX_RGB_VALUE;
+    if(blue > MAX_RGB_VALUE)
+        blue = MAX_RGB_VALUE;
+    
     RGB.control(true);
     RGB.color(red,green,blue);
     _currRed = red;
     _currGreen = green;
     _currBlue = blue;
+    Serial.print(red);
+    Serial.print(",");
+    Serial.print(green);
+    Serial.print(",)");
+    Serial.println(blue);
+    
+    
 }
 
 void RGBEffect::_setColor(unsigned char colorNum)
@@ -199,7 +255,7 @@ void RGBEffect::_setColor(unsigned char colorNum)
     _setColor(_red[colorNum],_green[colorNum],_blue[colorNum]);
 }
 
-void RGBEffect::_setColorS(unsigned char sequenceIndex)
+void RGBEffect::_setColorS(unsigned int sequenceIndex)
 {
     _setColor(_colorSequence[sequenceIndex]);
 }
