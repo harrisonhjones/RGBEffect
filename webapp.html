@@ -1,0 +1,256 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Spark RGB Library Demo Web App</title>
+  <script src="http://code.jquery.com/jquery-1.10.2.js"></script>
+</head>
+<body>
+
+<h1>Spark RGB Library Demo</h1>
+<b>Instructions</b>
+<ol>
+  <li>Input your spark token and device ID below. Your Spark Token and Device ID can be found in the Web IDE @ http://spark.io/build
+  <li>Flash the RGB firmware to your Spark Core. You will know it's been successful when your Spark Core's RGB LED starts to display a rainbow effect
+  <li>Use the controls below to demo the RGB library
+  <li>(Optional) Cleanup / Revoke your token. See <i>Security Concerns</i> below
+</ol>
+<b>Security Concerns</b><br/>
+<p>This web app mostly uses client-side calls to the Spark API so your access token and device are largely safe. The only time your token and device id is sent to a server other than the Spark Cloud is when you flash the firmware. When you click the "Flash RGB Firware" button below your token and device id are sent to a process on this server which uses them to instruct the Spark Cloud to flash the latest version of the firmware to your Spark Core. Your token and device id are NOT stored on my servers. However, this webpage is not "secure" (HTTPS) so I would recommend that, after playing with this app, you delete your token. You can do that by pressing the "How to Delete My Token" link below. This will send you to the Spark Docs page explaining how to delete an access token. Have fun with the app and feel free to browse it's source code on GitHub!</p>
+
+<h2>1. Spark Core Config</h2>
+Access Token: <input type="text" id="accessToken" name="accessToken" placeholder="Input Access Token"><br/><br/>
+Device ID: <input type="text" id="deviceID" name="deviceID" placeholder="Input Device ID">
+
+<h2>2. Flash the RGB Firmware</h2>
+<button id="flashFirmware">Flash RGB Firmware V1</button>
+
+<form action="/" id="searchForm">
+  
+<h2>3. Controls</h2>
+Click one of the buttons below to send a RGB command to your Spark Core.
+<br/><br/>
+Function: <button id="blink" value="Blink">Blink</button>
+<button id="fade" value="Fade">Fade</button>
+<button id="breath" value="Breath">Breath</button><br/><br/>
+
+Speed: <button id="slow" value="Slow">Slow</button>
+<button id="medium" value="Medium">Medium</button>
+<button id="fast" value="Fast">Fast</button><br/><br/>
+
+Num Colors: <button id="oneColor">One Color</button>
+<button id="twoColor">Two Color</button><br/><br/>
+
+Color 1: 
+<button id="clr1Red">Red</button>
+<button id="clr1Yellow">Yellow</button>
+<button id="clr1Green">Green</button>
+<button id="clr1Cyan">Cyan</button>
+<button id="clr1Blue">Blue</button>
+<button id="clr1Magenta">Magenta</button>
+
+<br/><br/>
+Color 2: 
+<button id="clr2Red">Red</button>
+<button id="clr2Yellow">Yellow</button>
+<button id="clr2Green">Green</button>
+<button id="clr2Cyan">Cyan</button>
+<button id="clr2Blue">Blue</button>
+<button id="clr2Magenta">Magenta</button>
+
+<br/><br/>
+Raw Command: <input type="text" id="commandToSend" disabled=true name="s" placeholder="Command">
+<input type="submit" id="sendButton" value="Send">
+</form>
+
+<!-- the result of the search will be rendered inside this div -->
+<br/><div id="result" style="font-weight: bold;"></div>
+
+<h2>4. Cleanup</h2>
+<a href="http://docs.spark.io/api/#authentication-deleting-an-access-token">How to Delete My Token</a>
+
+<script>
+var color1 = "255000000";
+var color2 = "000000255";
+var fn = "b";
+var speed = "m";
+var twoColor = false;
+
+$("#blink").click( function()
+{
+  fn = "b";
+  updateCommand();
+});
+$("#fade").click( function()
+{
+  fn = "f";
+  updateCommand();
+});
+$("#breath").click( function()
+{
+  fn = "r";
+  updateCommand();
+});
+$("#slow").click( function()
+{
+  speed = "s";
+  updateCommand();
+});
+$("#medium").click( function()
+{
+  speed = "m";
+  updateCommand();
+});
+$("#fast").click( function()
+{
+  speed = "f";
+  updateCommand();
+});
+$("#oneColor").click( function()
+{
+  twoColor = false;
+  updateCommand();
+});
+$("#twoColor").click( function()
+{
+  twoColor = true;
+  updateCommand();
+});
+$("#clr1Red").click( function()
+{
+  color1 = "255000000";
+  updateCommand();
+});
+$("#clr1Yellow").click( function()
+{
+  color1 = "255255000";
+  updateCommand();
+});
+$("#clr1Green").click( function()
+{
+  color1 = "000255000";
+  updateCommand();
+});
+$("#clr1Cyan").click( function()
+{
+  color1 = "000255255";
+  updateCommand();
+});
+$("#clr1Blue").click( function()
+{
+  color1 = "000000255";
+  updateCommand();
+});
+$("#clr1Magenta").click( function()
+{
+  color1 = "255000255";
+  updateCommand();
+});
+$("#clr2Red").click( function()
+{
+  color2 = "255000000";
+  updateCommand();
+});
+$("#clr2Yellow").click( function()
+{
+  color2 = "255255000";
+  updateCommand();
+});
+$("#clr2Green").click( function()
+{
+  color2 = "000255000";
+  updateCommand();
+});
+$("#clr2Cyan").click( function()
+{
+  color2 = "000255255";
+  updateCommand();
+});
+$("#clr2Blue").click( function()
+{
+  color2 = "000000255";
+  updateCommand();
+});
+$("#clr2Magenta").click( function()
+{
+  color2 = "255000255";
+  updateCommand();
+});
+
+$("#deleteToken").click( function()
+{
+  alert("Woo!");
+});
+
+$("#flashFirmware").click( function()
+{
+  $( "#flashFirmware").prop("disabled",false);
+  var accessToken = $("#accessToken").val();
+  var deviceID = $( "#deviceID" ).val();
+  var url = "putFirmware.php?deviceID=" + deviceID + "&accessToken=" + accessToken;
+  console.log(url);
+  var getPushFirmware = $.get(url);
+
+  getPushFirmware.done(function (data)
+  {
+    $( "#flashFirmware").prop("disabled",false);
+    console.log(data);
+    if(data.status == "Update started")
+      $( "#result" ).empty().append( "Firmware sent. Please wait until it is flashing a rainbow! ");
+    else
+      $( "#result" ).empty().append( "Firmware upload failed! ");
+  });
+  getPushFirmware.error(function (data) {
+    $( "#flashFirmware").prop("disabled",false);
+    $( "#result" ).empty().append( "Firmware sent. Please wait until it is flashing a rainbow! ");
+  });
+});
+
+function updateCommand()
+{
+  if(twoColor == true)
+    $( "#commandToSend" ).val("" + fn + speed + color1 + color2);
+  else
+    $( "#commandToSend" ).val("" + fn + speed + color1);  
+  
+}
+// Attach a submit handler to the form
+$( "#searchForm" ).submit(function( event ) {
+
+  // Stop form from submitting normally
+  event.preventDefault();
+  $( "#result" ).empty().append("Sending...");
+  $( "#sendButton").prop("disabled",true);
+
+  // Get some values from elements on the page:
+  var $form = $( this ),
+    term = $form.find( "input[name='s']" ).val(),
+    accessToken = $("#accessToken").val(),
+    deviceID = $( "#deviceID" ).val();
+ 
+  var url = "https://api.spark.io/v1/devices/" + deviceID + "/rgb";
+  // Send the data using post
+  var posting = $.post( url, { args: term, access_token: accessToken} );
+ 
+  // Put the results in a div
+  posting.done(function( data ) {
+    $( "#sendButton").prop("disabled",false);
+    if(data.return_value > 0)
+      $( "#result" ).empty().append( "Command succeeded! ");
+    else
+      $( "#result" ).empty().append( "Command failed! ");
+    console.log(data);
+  });
+
+  posting.error(function (data) {
+    $( "#sendButton").prop("disabled",false);
+    $( "#result" ).empty().append( "Command failed! Did you forget to fill out the device ID and access token?");
+  });
+});
+</script>
+
+<!-- From : http://codepo8.github.io/css-fork-on-github-ribbon/ -->
+<style>#forkongithub a{background:#000;color:#fff;text-decoration:none;font-family:arial,sans-serif;text-align:center;font-weight:bold;padding:5px 40px;font-size:1rem;line-height:2rem;position:relative;transition:0.5s;}#forkongithub a:hover{background:#c11;color:#fff;}#forkongithub a::before,#forkongithub a::after{content:"";width:100%;display:block;position:absolute;top:1px;left:0;height:1px;background:#fff;}#forkongithub a::after{bottom:1px;top:auto;}@media screen and (min-width:800px){#forkongithub{position:fixed;display:block;top:0;right:0;width:200px;overflow:hidden;height:200px;z-index:9999;}#forkongithub a{width:200px;position:absolute;top:60px;right:-60px;transform:rotate(45deg);-webkit-transform:rotate(45deg);-ms-transform:rotate(45deg);-moz-transform:rotate(45deg);-o-transform:rotate(45deg);box-shadow:4px 4px 10px rgba(0,0,0,0.8);}}</style><span id="forkongithub"><a href="https://github.com/harrisonhjones/RGBEffect">View on GitHub</a></span>
+
+</body>
+</html>
