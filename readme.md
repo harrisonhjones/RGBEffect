@@ -16,7 +16,7 @@ A RGB effects library for Spark Core.
 * Look at the demos/usage below
 
 ## Usage
-This library is much more complicated than my original LEDEffect library, which this library is loosely based on. To use this library you must first define colors (sort of like a color pallet) and then you can use those defined colors with different effects. 
+This library is much more complicated than my original LEDEffect library, which this library is loosely based on. To use this library you must first define colors (sort of like a color palette) and then you can use those defined colors with different effects. 
 
 ### List of Available Effects
 
@@ -29,7 +29,7 @@ This library is much more complicated than my original LEDEffect library, which 
 ### Interacting with Colors
 
 * setColor - used to associate a red, green, blue color to a specific color number
-* swapColors - used to swap two colors in the pallet
+* swapColors - used to swap two colors in the palette
 
 ### Other Functions
 
