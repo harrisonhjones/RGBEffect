@@ -6,7 +6,7 @@ A RGB effects library for Spark Core.
 # Installation
 ## SparkCore (OTA for Demoing)
 
-* Navigate to [The Demo Web App](hhj.me/rgblibrarydemo)
+* Navigate to [The Demo Web App](http://hhj.me/rgblibrarydemo)
 * Follow the instructions to flash the latest demo firmware to your Spark Core over the air (OTA) and control it once it's there.
 
 ## SparkCore (for Development)
