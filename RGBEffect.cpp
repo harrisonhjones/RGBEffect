@@ -32,7 +32,6 @@ void RGBEffect::update()
 	if((millis() - _time) > _ledDelay)
 	{
 		_time = millis();
-                
 		if(_ledState == STATE_OFF)
                     _setColor(0,0,0);
 		else if(_ledState == STATE_ON)
@@ -107,6 +106,7 @@ void RGBEffect::blink(unsigned int colorNumSeq[], unsigned int numInSeq)
 
 void RGBEffect::release()
 {
+    _ledState = STATE_RELEASED;
     RGB.control(false);
 }
 void RGBEffect::setColor(unsigned char colorNum, unsigned int red, unsigned int green, unsigned int blue)
@@ -246,8 +246,6 @@ void RGBEffect::_setColor(unsigned int red, unsigned int green, unsigned int blu
     Serial.print(green);
     Serial.print(",)");
     Serial.println(blue);
-    
-    
 }
 
 void RGBEffect::_setColor(unsigned char colorNum)

@@ -17,11 +17,12 @@
 #define MAX_SEQUENCE_LENGTH 10
 #define FADE_AMOUNT 5
 
-#define STATE_OFF 0
-#define STATE_ON 1
-#define STATE_BREATH 2
-#define STATE_FADE 3
-#define STATE_BLINK 4
+#define STATE_RELEASED 0
+#define STATE_OFF 1
+#define STATE_ON 2
+#define STATE_BREATH 3
+#define STATE_FADE 4
+#define STATE_BLINK 5
 
 class RGBEffect
 {
